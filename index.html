@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Modelagem 3D & Unity</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --accent-green: #00ff87;
+            --accent-green-hover: #00b35e;
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(18, 18, 18, 0.95);
+            border-bottom: 1px solid rgba(0, 255, 135, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: var(--accent-green);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            font-size: 1rem;
+            font-weight: 500;
+            padding-bottom: 0.25rem;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-green);
+            border-bottom: 2px solid var(--accent-green);
+        }
+
+        /* --- LAYOUT SECTIONS --- */
+        section {
+            padding: 8rem 2rem 2rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        section + section:not(#contato) {
+            padding-top: 6rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 40px;
+            height: 3px;
+            background-color: var(--accent-green);
+            border-radius: 2px;
+        }
+
+        /* --- ABOUT ME SECTION --- */
+        .about-content {
+            background-color: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-green);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .about-content p {
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+        }
+
+        .about-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* --- PROJECTS GRID SECTION --- */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+            margin-top: 1rem;
+        }
+
+        .project-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 255, 135, 0.1);
+            border-color: rgba(0, 255, 135, 0.2);
+        }
+
+        /* --- SLIDESHOW / CAROUSEL CONTAINER --- */
+        .project-media-carousel {
+            width: 100%;
+            height: 220px;
+            background-color: #2a2a2a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .carousel-slides {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .media-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            padding: 0 1rem;
+            background: linear-gradient(135deg, #1e1e1e 0%, #252525 100%);
+        }
+
+        /* NAVIGATION ARROWS */
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            z-index: 10;
+            transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease;
+            user-select: none;
+            border: 1px solid transparent;
+        }
+
+        .carousel-btn:hover {
+            background-color: rgba(0, 255, 135, 0.2);
+            color: var(--accent-green);
+            border-color: rgba(0, 255, 135, 0.4);
+        }
+
+        .carousel-btn.prev {
+            left: 10px;
+        }
+
+        .carousel-btn.next {
+            right: 10px;
+        }
+
+        /* --- PROJECT INFO --- */
+        .project-info {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .project-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #fff;
+        }
+
+        .project-description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .project-tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tech-tag {
+            font-size: 0.75rem;
+            background-color: rgba(0, 255, 135, 0.08);
+            color: var(--accent-green);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-weight: 600;
+            border: 1px solid rgba(0, 255, 135, 0.15);
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            background-color: #0a0a0a;
+            padding: 3rem 2rem;
+            margin-top: 6rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .social-links a {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .social-links a:hover {
+            color: var(--accent-green);
+        }
+
+        /* --- RESPONSIVE DESIGN --- */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 1.2rem 1.5rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .nav-links a {
+                font-size: 0.9rem;
+            }
+
+            section {
+                padding: 6rem 1.5rem 2rem 1.5rem;
+            }
+
+            section + section:not(#contato) {
+                padding-top: 5rem;
+            }
+
+            .about-content {
+                padding: 1.75rem;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .footer-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .carousel-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CABEÇALHO E NAVEGAÇÃO -->
+    <header>
+        <div class="nav-container">
+            <div class="logo">Amanda<span>.Lira</span></div>
+            <nav class="nav-links">
+                <a href="#sobre">Sobre</a>
+                <a href="#modelagem">Modelagem 3D</a>
+                <a href="#unity">Unity & VR</a>
+                <a href="#contato">Contato</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- SEÇÃO SOBRE MIM -->
+    <section id="sobre">
+        <h2>Sobre Mim</h2>
+        <div class="about-content">
+            <p>Olá! Sou desenvolvedora e modeladora 3D focada na criação de experiências interativas, ambientes otimizados e mecânicas imersivas dentro da Unity. Unindo a fundamentação técnica da Ciência da Computação com a paixão pela arte técnica, busco sempre o equilíbrio ideal entre performance e fidelidade visual.</p>
+            <p>Tenho experiência prática no desenvolvimento de simuladores virtuais, prototipagem ágil, integração com sistemas de hardware (como Arduino/BLE) e otimização asset-to-engine para plataformas móveis e de Realidade Virtual (VR).</p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO MODELAGEM 3D -->
+    <section id="modelagem">
+        <h2>Modelagem 3D</h2>
+        <div class="projects-grid">
+            
+            <!-- Projeto 1 (Modelagem) -->
+            <div class="project-card">
+                <div class="project-media-carousel">
+                    <button class="carousel-btn prev">&#10094;</button>
+                    <button class="carousel-btn next">&#10095;</button>
+                    <div class="carousel-slides">
+                        <!-- Substitua as divs placeholder abaixo pelas suas tags <img> ou <img src="seu_gif.gif"> -->
+                        <div class="slide active"><img src="vorteco.gif" alt="cat"></div>
+                        <div class="slide"><img src="npc.gif" alt="pidgeon"></div>
+                    </div>
+                </div>
+                <div class="project-info">
+                    <h3 class="project-title">Modelagem de Personagens Estilizados</h3>
+                    <p class="project-description">Criação de personagem focado em narrativa visual com estética estilizada. O processo priorizou uma topologia limpa e otimizada (Low Poly), garantindo uma malha deformável para rigging e animação dentro da Unity, aliado a texturas PBR.</p>
+                    <div class="project-tech-tags">
+                        <span class="tech-tag">Character Modeling</span>
+                        <span class="tech-tag">Retopologia</span>
+                        <span class="tech-tag">Rigging Ready</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projeto 2 (Modelagem) -->
+            <div class="project-card">
+                <div class="project-media-carousel">
+                    <button class="carousel-btn prev">&#10094;</button>
+                    <button class="carousel-btn next">&#10095;</button>
+                    <div class="carousel-slides">
+                        <div class="slide active"><img src="stylezed cat.gif" alt="cat"></div>
+                        <div class="slide"><img src="stylezed pidgeon.gif" alt="pidgeon"></div>
+                    </div>
+                </div>
+                <div class="project-info">
+                    <h3 class="project-title">Modelagem Orgânica e Texturização</h3>
+                    <p class="project-description">Desenvolvimento de asset orgânico estilizado para composição de cenários. O fluxo de trabalho englobou desde a escultura em alta resolução (High Poly) até a retopologia otimizada e o UV Unwrapping minucioso para a aplicação de texturas pintadas/procedurais.</p>
+                    <div class="project-tech-tags">
+                        <span class="tech-tag">Modelagem Orgânica</span>
+                        <span class="tech-tag">UV Unwrapping</span>
+                        <span class="tech-tag">Texturização Estilizada</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projeto 3 (Modelagem) -->
+            <div class="project-card">
+                <div class="project-media-carousel">
+                    <button class="carousel-btn prev">&#10094;</button>
+                    <button class="carousel-btn next">&#10095;</button>
+                    <div class="carousel-slides">
+                        <div class="slide active"><img src="low poly frog.gif" alt="sapo low poly"></div>
+                        <div class="slide"><img src="low poly quati 2.gif" alt="quati low poly"></div>
+                        <div class="slide"><img src="low poly falcon.gif" alt="falcon low poly"></div>
+                    </div>
+                </div>
+                <div class="project-info">
+                    <h3 class="project-title">Fauna Low Poly</h3>
+                    <p class="project-description">Estudo focado em extrema redução de contagem de polígonos sem sacrificar a leitura da silhueta e o aspecto geométrico do modelo. Asset altamente performático, construído visando economia de recursos e integração imediata na engine.</p>
+                    <div class="project-tech-tags">
+                        <span class="tech-tag">Low Poly</span>
+                        <span class="tech-tag">Otimização de Malha</span>
+                        <span class="tech-tag">Game Ready</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projeto 4 (Modelagem) -->
+            <div class="project-card">
+                <div class="project-media-carousel">
+                    <div class="carousel-slides">
+                        <div class="slide active"><img src="stylezed pond.gif" alt="pond"></div>
+                    </div>
+                </div>
+                <div class="project-info">
+                    <h3 class="project-title">Estruturas e Props Estilizados</h3>
+                    <p class="project-description">Modelagem de estruturas modulares para construção de ambientes imersivos. O desenvolvimento envolveu a edição direta da malha para performance, criação de materiais procedurais e texture baking, visando a redução de draw calls em cena.</p>
+                    <div class="project-tech-tags">
+                        <span class="tech-tag">Environment Props</span>
+                        <span class="tech-tag">Texture Baking</span>
+                        <span class="tech-tag">Level Art</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SEÇÃO DESENVOLVIMENTO UNITY & VR -->
+    <section id="unity">
+        <h2>Desenvolvimento Unity & VR</h2>
+        <div class="projects-grid">
+            
+            <!-- Projeto 1 (Unity) -->
+            <div class="project-card">
+                <div class="project-media-carousel">
+                    <button class="carousel-btn prev">&#10094;</button>
+                    <button class="carousel-btn next">&#10095;</button>
+                    <div class="carousel-slides">
+                        <div class="slide active"><div class="media-placeholder">MedSim - GIF Fluxo Clínico</div></div>
+                        <div class="slide"><div class="media-placeholder">MedSim - Sistema de Interação VR</div></div>
+                        <div class="slide"><div class="media-placeholder">MedSim - Painel de Feedback/Score</div></div>
+                    </div>
+                </div>
+                <div class="project-info">
+                    <h3 class="project-title">MedSim VR Framework</h3>
+                    <p class="project-description">Protótipo modular interativo em realidade virtual para treinamento de procedimentos de saúde. Desenvolvimento da lógica interna do fluxo de anamnese, score de desempenho e arquitetura extensível.</p>
+                    <div class="project-tech-tags">
+                        <span class="tech-tag">Unity</span>
+                        <span class="tech-tag">VR Interaction Toolkit</span>
+                        <span class="tech-tag">C# Architecture</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projeto 2 (Unity) -->
+            <div class="project-card">
+                <div class="project-media-carousel">
+                    <button class="carousel-btn prev">&#10094;</button>
+                    <button class="carousel-btn next">&#10095;</button>
+                    <div class="carousel-slides">
+                        <div class="slide active"><div class="media-placeholder">BoraDeBike - GIF Hardware Integrado</div></div>
+                        <div class="slide"><div class="media-placeholder">BoraDeBike - Conexão BLE / Telemetria</div></div>
+                        <div class="slide"><div class="media-placeholder">BoraDeBike - Script de Entrada de Dados</div></div>
+                    </div>
+                </div>
+                <div class="project-info">
+                    <h3 class="project-title">BoraDeBike VR Simulator</h3>
+                    <p class="project-description">Simulador imersivo integrado a hardware externo. Arquitetura de entrada de dados assíncrona recebendo informações de velocidade e direção vindas de sensores Arduino acoplados a uma bicicleta real.</p>
+                    <div class="project-tech-tags">
+                        <span class="tech-tag">Unity</span>
+                        <span class="tech-tag">Arduino Hardware</span>
+                        <span class="tech-tag">Bluetooth LE</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-media-carousel">
+                    <button class="carousel-btn prev">&#10094;</button>
+                    <button class="carousel-btn next">&#10095;</button>
+                    <div class="carousel-slides">
+                        <div class="slide active"><div class="media-placeholder">Yaguara - GIF Gameplay Scripting</div></div>
+                        <div class="slide"><div class="media-placeholder">Yaguara - Custom Shader Graph Vento</div></div>
+                        <div class="slide"><div class="media-placeholder">Yaguara - State Machine do Personagem</div></div>
+                    </div>
+                </div>
+                <div class="project-info">
+                    <h3 class="project-title">Tails Through Time</h3>
+                    <p class="project-description"> Criação de shaders personalizados via Shader Graph e High Level Shader Language para estilização.</p>
+                    <div class="project-tech-tags">
+                        <span class="tech-tag">C# Gameplay</span>
+                        <span class="tech-tag">Shader Graph</span>
+                        <span class="tech-tag">Vertex Animation</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projeto 4 (Unity) -->
+            <div class="project-card">
+                <div class="project-media-carousel">
+                    <button class="carousel-btn prev">&#10094;</button>
+                    <button class="carousel-btn next">&#10095;</button>
+                    <div class="carousel-slides">
+                        <div class="slide active"><div class="media-placeholder">Sereiados - GIF Layout Responsivo</div></div>
+                        <div class="slide"><div class="media-placeholder">Sereiados - Integração XML / USS</div></div>
+                        <div class="slide"><div class="media-placeholder">Sereiados - Sistema de Filtros Dinâmicos</div></div>
+                    </div>
+                </div>
+                <div class="project-info">
+                    <h3 class="project-title">Sereiados Custom UI Dashboard</h3>
+                    <p class="project-description">Desenvolvimento de uma interface robusta utilizando a tecnologia moderna do UI Toolkit da Unity. Layout responsivo baseado em USS para controle dinâmico e visualização estruturada de grandes volumes de dados.</p>
+                    <div class="project-tech-tags">
+                        <span class="tech-tag">Unity</span>
+                        <span class="tech-tag">UI Toolkit</span>
+                        <span class="tech-tag">USS / Extensible XML</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- RODAPÉ & CONTATO -->
+    <footer id="contato">
+        <div class="footer-container">
+            <p class="footer-text">&copy; 2026 Amanda. Todos os direitos reservados.</p>
+            <div class="social-links">
+                <a href="#" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                <a href="#" target="_blank" rel="noopener noreferrer">ArtStation</a>
+                <a href="mailto:seu.email@exemplo.com">Email</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- LOGICA DO CARROSSEL (JAVASCRIPT) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const carousels = document.querySelectorAll('.project-media-carousel');
+
+            carousels.forEach(carousel => {
+                const slides = carousel.querySelectorAll('.slide');
+                const nextBtn = carousel.querySelector('.carousel-btn.next');
+                const prevBtn = carousel.querySelector('.carousel-btn.prev');
+                let currentIndex = 0;
+                let autoSlideInterval;
+
+                // Função para atualizar o slide ativo
+                function showSlide(index) {
+                    slides[currentIndex].classList.remove('active');
+                    currentIndex = (index + slides.length) % slides.length;
+                    slides[currentIndex].classList.add('active');
+                }
+
+                // Funções de navegação
+                function nextSlide() {
+                    showSlide(currentIndex + 1);
+                }
+
+                function prevSlide() {
+                    showSlide(currentIndex - 1);
+                }
+
+                // Inicia o timer para passar automaticamente (4 segundos)
+                function startAutoSlide() {
+                    autoSlideInterval = setInterval(nextSlide, 4000);
+                }
+
+                // Reseta o timer quando o usuário interage manualmente
+                function resetAutoSlide() {
+                    clearInterval(autoSlideInterval);
+                    startAutoSlide();
+                }
+
+                // Eventos dos botões
+                nextBtn.addEventListener('click', () => {
+                    nextSlide();
+                    resetAutoSlide();
+                });
+
+                prevBtn.addEventListener('click', () => {
+                    prevSlide();
+                    resetAutoSlide();
+                });
+
+                // Inicialização do carrossel individual
+                startAutoSlide();
+            });
+        });
+    </script>
+</body>
+</html>
